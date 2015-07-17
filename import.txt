@@ -1,0 +1,32 @@
+cd "F:\data\john_pc2\consultoria\Mapa_situacoes_Floresteca_2014"
+
+r.in.gdal in=uso_pau_darco_union_rast.img out=uso_pau_darco_union_rast_img --o -o 
+v.in.ogr dsn=if.shp out=if_shp -o
+g.region rast=uso_pau_darco_union_rast_img
+
+
+r.mapcalc "MapaBinario=uso_pau_darco_union_rast_img"
+r.mapcalc "A=MapaBinario"
+#r.mapcalc "MapaBinario=A"
+r.colors map=A color=random
+r.mapcalc "MapaBinario_A=if(A[0,0]==0 && A[0,-1]==1 && A[1,-1]==0 && A[1,0]==1,1,A)"
+r.mapcalc "A=MapaBinario_A"
+r.mapcalc "MapaBinario_AB=if(A[0,0]==0 && A[-1,0]==1 && A[-1,1]==0 && A[0,1]==1,1,A)"
+r.mapcalc "A=MapaBinario_AB"
+
+r.mapcalc "MapaBinario_ABC=if(A[0,0]==0 && A[0,1]==1 && A[1,1]==0 && A[1,0]==1,1,A)"
+r.mapcalc "A=MapaBinario_ABC"
+r.mapcalc "MapaBinario_ABCD=if(A[0,0]==0 && A[1,0]==1 && A[1,1]==0 && A[0,1]==1,1,A)"
+r.mapcalc "A=MapaBinario_ABCD"
+
+r.mapcalc "uso_pau_darco_union_rast_img_patch=A"
+r.colors map=uso_pau_darco_union_rast_img_patch color=random
+
+r.clump --o input=uso_pau_darco_union_rast_img_patch output=uso_pau_darco_union_rast_img_patch_clump
+r.mapcalc "uso_pau_darco_union_rast_img_patch_clump_mata=uso_pau_darco_union_rast_img_patch_clump*uso_pau_darco_union_rast_img"
+r.mapcalc "uso_pau_darco_union_rast_img_patch_clump_mata_limpa=if(uso_pau_darco_union_rast_img_patch_clump_mata>0,uso_pau_darco_union_rast_img_patch_clump_mata,null())"
+r.colors map=uso_pau_darco_union_rast_img_patch_clump_mata_limpa color=random
+
+
+patch_id_list=`r.stats -n input=uso_pau_darco_union_rast_img_patch_clump_mata_limpa`
+r.out.gdal in=uso_pau_darco_union_rast_img_patch_clump_mata_limpa out=uso_pau_darco_union_rast_img_patch_clump_mata_limpa.img format=HFA

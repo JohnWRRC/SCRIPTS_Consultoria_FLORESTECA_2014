@@ -1,0 +1,9 @@
+cd "F:\data\john_pc2\consultoria\GRASS\saidas"
+
+corre=`g.mlist pattern="*sem0"`
+for f_in in $corre
+do
+r.out.gdal in=$f_in out=$f_in.tif format=GTiff --v nodata=-9999
+done
+
+r.out.gdal in=uso_pau_darco_union_rast_img out=uso_pau_darco_union_rast_img.tif format=GTiff -v nodata=-9999
